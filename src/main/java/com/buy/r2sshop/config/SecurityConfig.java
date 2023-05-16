@@ -7,7 +7,7 @@ public class SecurityConfig {
         return BCrypt.hashpw(password, BCrypt.gensalt());
     }
 
-    public static boolean check(String rawPassword, String encodedPassword) {
+    public static boolean checkPW(String rawPassword, String encodedPassword) {
         return BCrypt.checkpw(rawPassword, encodedPassword);
     }
 }
