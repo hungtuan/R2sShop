@@ -48,6 +48,9 @@ public class Orders {
     @Column(name = "total_price")
     private Double total_price;
 
+    @Column(name = "delivery_time")
+    private LocalDateTime delivery_time;
+
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;

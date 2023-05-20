@@ -1,0 +1,15 @@
+package com.buy.r2sshop.payload;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+
+@Data
+@Builder
+@AllArgsConstructor
+public class RegisterRequest {
+    private String username;
+
+    private String password;
+
+}

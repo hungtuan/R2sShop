@@ -30,6 +30,18 @@ public class VariantProduct {
     @Column(name = "price")
     private Double price;
 
+    @Column(name = "color")
+    private String color;
+
+    @Column(name = "size")
+    private String size;
+
+    @Column(name = "material")
+    private String material;
+
+    @Column(name = "quantity")
+    private Integer quantity;
+
     @ManyToOne
     @JoinColumn(name = "product_id")
     private Product product;
