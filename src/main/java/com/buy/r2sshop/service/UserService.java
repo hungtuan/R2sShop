@@ -1,31 +1,32 @@
 package com.buy.r2sshop.service;
 
+import com.buy.r2sshop.config.CustomUserDetailsService;
 import com.buy.r2sshop.entity.Cart;
 import com.buy.r2sshop.entity.Role;
 import com.buy.r2sshop.entity.User;
 import com.buy.r2sshop.repository.CartRepository;
 import com.buy.r2sshop.repository.RoleRepository;
 import com.buy.r2sshop.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
+import com.buy.r2sshop.util.JwtUtil;
+import lombok.AllArgsConstructor;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+@AllArgsConstructor
 @Service
 public class UserService implements IUserService {
     private final UserRepository userRepository;
     private final CartRepository cartRepository;
     private final PasswordEncoder passwordEncoder;
     private final RoleRepository roleRepository;
-
-    @Autowired
-    public UserService(UserRepository userRepository, CartRepository cartRepository, PasswordEncoder passwordEncoder, RoleRepository roleRepository) {
-        this.userRepository = userRepository;
-        this.cartRepository = cartRepository;
-        this.passwordEncoder = passwordEncoder;
-        this.roleRepository = roleRepository;
-    }
-
+    private final AuthenticationManager authenticationManager;
+    private final JwtUtil jwtUtil;
+    private final CustomUserDetailsService customUserDetailsService;
 
     public void registerUserAsUser(String username, String password) {
         Role userRole = roleRepository.findByName("USER");
@@ -65,5 +66,15 @@ public class UserService implements IUserService {
         cartRepository.save(cart);
     }
 
-    //
+    //Thực hiện đăng nhập và trả về token
+    public String login(String username, String password) throws Exception {
+        try {
+            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
+            UserDetails userDetails = customUserDetailsService.loadUserByUsername(username);
+            String role = userDetails.getAuthorities().isEmpty() ? "" : userDetails.getAuthorities().iterator().next().getAuthority();
+            return jwtUtil.generateToken(userDetails, role);
+        } catch (AuthenticationException e) {
+            throw new Exception("Invalid username or password");
+        }
+    }
 }

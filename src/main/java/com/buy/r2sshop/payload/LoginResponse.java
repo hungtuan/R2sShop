@@ -9,7 +9,7 @@ import java.util.Set;
 @Data
 @Builder
 @AllArgsConstructor
-public class AuthenticationResponse {
+public class LoginResponse {
     private String token;
 
     public void setUsername(String username) {

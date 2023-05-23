@@ -1,19 +1,18 @@
 package com.buy.r2sshop.controller;
 
-import com.buy.r2sshop.entity.User;
-import com.buy.r2sshop.payload.AuthenticationRequest;
-import com.buy.r2sshop.payload.AuthenticationResponse;
+import com.buy.r2sshop.payload.LoginRequest;
+import com.buy.r2sshop.payload.LoginResponse;
 import com.buy.r2sshop.payload.RegisterRequest;
 import com.buy.r2sshop.service.IUserService;
-import com.buy.r2sshop.service.UserService;
 import com.buy.r2sshop.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -42,6 +41,39 @@ public class UserController {
 
     //Đăng nhập
 
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
+        try {
+            String token = userService.login(loginRequest.getUsername(), loginRequest.getPassword());
+            return ResponseEntity.ok(new LoginResponse(token));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/admin")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<?> adminEndpoint(@AuthenticationPrincipal UserDetails userDetails) {
+        // Kiểm tra thông tin về quyền từ token
+        String role = userDetails.getAuthorities().stream().findFirst().get().getAuthority();
+        if (role.equals("ADMIN")) {
+            return ResponseEntity.ok("Admin Endpoint");
+        } else {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Access denied");
+        }
+    }
+
+    @GetMapping("/user")
+    @PreAuthorize("hasAuthority('USER')")
+    public ResponseEntity<?> userEndpoint(@AuthenticationPrincipal UserDetails userDetails) {
+        // Kiểm tra thông tin về quyền từ token
+        String role = userDetails.getAuthorities().stream().findFirst().get().getAuthority();
+        if (role.equals("USER")) {
+            return ResponseEntity.ok("User Endpoint");
+        } else {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Access denied");
+        }
+    }
 
 
 }

@@ -15,26 +15,25 @@ import java.util.function.Function;
 @Component
 public class JwtUtil {
 
-    @Value("${jwt.secret}")
-    private String secret;
+    @Value("${jwt.secretKey}")
+    private String secretKey;
 
-    @Value("${jwt.expiration}")
-    private Long expiration;
+    @Value("${jwt.expirationTime}")
+    private Long expirationTime;
 
-    public String generateToken(UserDetails userDetails) {
+    public String generateToken(UserDetails userDetails, String role) {
         Map<String, Object> claims = new HashMap<>();
-        return createToken(claims, userDetails.getUsername());
-    }
+        claims.put("role", role);
 
-    private String createToken(Map<String, Object> claims, String subject) {
         return Jwts.builder()
                 .setClaims(claims)
-                .setSubject(subject)
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + expiration))
-                .signWith(SignatureAlgorithm.HS256, secret)
+                .setSubject(userDetails.getUsername())
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + expirationTime))
+                .signWith(SignatureAlgorithm.HS256, secretKey)
                 .compact();
     }
+
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
@@ -50,7 +49,7 @@ public class JwtUtil {
     }
 
     private Claims extractAllClaims(String token) {
-        return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody();
+        return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody();
     }
 
     private boolean isTokenExpired(Date expirationDate) {
@@ -59,7 +58,7 @@ public class JwtUtil {
 
     public boolean isTokenValid(String jwt, UserDetails userDetails) {
         Claims claims = Jwts.parser()
-                .setSigningKey(secret)
+                .setSigningKey(secretKey)
                 .parseClaimsJws(jwt)
                 .getBody();
 
