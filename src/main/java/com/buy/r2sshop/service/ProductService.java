@@ -15,22 +15,20 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class ProductService {
+public class ProductService implements IProductService {
     @Autowired
     private ProductRepository productRepository;
 
-    //Product theo category
+    @Override
     public List<Product> getProductsByCategoryWithPaging(Category category, int page, int pageSize) {
         Pageable pageable = PageRequest.of(page, pageSize);
         Page<Product> productPage = productRepository.findByCategory(category, pageable);
         return productPage.getContent();
     }
 
-    //Product theo id
+    @Override
     public Product getProductById(int productId) {
         Optional<Product> productOptional = productRepository.findById(productId);
         return productOptional.orElse(null);
     }
-
-
 }

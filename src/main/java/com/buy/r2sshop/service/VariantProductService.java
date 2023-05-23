@@ -7,11 +7,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+
 @Service
-public class VariantProductService {
+public class VariantProductService implements IVariantProductService {
     @Autowired
     private VariantProductRepository variantProductRepository;
 
+    @Override
     public List<VariantProduct> getVariantsByProduct(Product product) {
         return variantProductRepository.findByProduct(product);
     }

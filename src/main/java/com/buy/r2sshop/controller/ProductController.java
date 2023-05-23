@@ -3,12 +3,11 @@ package com.buy.r2sshop.controller;
 import com.buy.r2sshop.entity.Category;
 import com.buy.r2sshop.entity.Product;
 import com.buy.r2sshop.entity.VariantProduct;
-import com.buy.r2sshop.service.CategoryService;
-import com.buy.r2sshop.service.ProductService;
-import com.buy.r2sshop.service.VariantProductService;
+import com.buy.r2sshop.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,14 +17,15 @@ import java.util.List;
 @RequestMapping("/v1")
 public class ProductController {
     @Autowired
-    private CategoryService categoryService;
+    private ICategoryService categoryService;
     @Autowired
-    private ProductService productService;
+    private IProductService productService;
 
     @Autowired
-    private VariantProductService variantProductService;
+    private IVariantProductService variantProductService;
 
     //Lấy product theo category name
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     @GetMapping("/products")
     public ResponseEntity<List<Product>> getAllProductsByCategory(@RequestParam("category") String categoryName,
                                                                   @RequestParam("page") int page,
@@ -36,6 +36,7 @@ public class ProductController {
     }
 
     //Lấy product theo id
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     @GetMapping("/products/{id}")
     public ResponseEntity<Product> getProductById(@PathVariable("id") int productId) {
         Product product = productService.getProductById(productId);
@@ -46,13 +47,12 @@ public class ProductController {
         }
     }
 
-//    Lấy biến thế product VariantProduct
+    //    Lấy biến thế product VariantProduct
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     @GetMapping("/products/{productId}/variants")
     public ResponseEntity<List<VariantProduct>> getVariantsByProduct(@PathVariable("productId") Integer productId) {
         Product product = productService.getProductById(productId);
         List<VariantProduct> variants = variantProductService.getVariantsByProduct(product);
         return new ResponseEntity<>(variants, HttpStatus.OK);
     }
-
-
 }

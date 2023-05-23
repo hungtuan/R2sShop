@@ -33,8 +33,4 @@ public class Product {
     @ManyToOne
     @JoinColumn(name = "category_id")
     private Category category;
-
-    @JsonIgnoreProperties("product")
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
-    private List<VariantProduct> variants;
 }

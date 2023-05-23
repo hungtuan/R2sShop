@@ -1,18 +1,22 @@
 package com.buy.r2sshop.config;
 
-import com.buy.r2sshop.dao.UserDao;
+import com.buy.r2sshop.entity.Role;
 import com.buy.r2sshop.repository.UserRepository;
+import com.buy.r2sshop.service.IUserService;
+import com.buy.r2sshop.service.UserService;
 import com.buy.r2sshop.util.JwtRequestFilter;
 import com.buy.r2sshop.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -38,8 +42,7 @@ public class SecurityConfig {
 
     private final JwtRequestFilter jwtRequestFilter;
 
-    private final UserDao userDao;
-
+    private final CustomUserDetailsService userDetailsService;
 
     // Cấu hình HttpSecurity
     @Bean
@@ -47,7 +50,7 @@ public class SecurityConfig {
         http
                 .csrf().disable()
                 .authorizeRequests()
-                .requestMatchers("/v1/login").permitAll()
+                .requestMatchers("/v1/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .sessionManagement()
@@ -62,7 +65,7 @@ public class SecurityConfig {
     @Bean
     public AuthenticationProvider authenticationProvider() {
         final DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
-        authenticationProvider.setUserDetailsService(userDetailsService());
+        authenticationProvider.setUserDetailsService(userDetailsService);
         authenticationProvider.setPasswordEncoder(passwordEncoder());
         return authenticationProvider;
     }
@@ -74,17 +77,8 @@ public class SecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return NoOpPasswordEncoder.getInstance();
+        return new BCryptPasswordEncoder();
     }
 
-    @Bean
-    public UserDetailsService userDetailsService() {
-        return new UserDetailsService() {
-            @Override
-            public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-                return userDao.findUserByUsername(username);
-            }
-        };
-    }
 }
 
