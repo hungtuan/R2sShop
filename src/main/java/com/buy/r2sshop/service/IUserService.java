@@ -6,6 +6,6 @@ public interface IUserService  {
 
     void registerUserAsAdmin(String username, String password);
 
-    String login(String username, String password) throws Exception;
+    String login(String username, String password);
 
 }

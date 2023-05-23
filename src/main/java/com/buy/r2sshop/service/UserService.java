@@ -9,6 +9,7 @@ import com.buy.r2sshop.repository.RoleRepository;
 import com.buy.r2sshop.repository.UserRepository;
 import com.buy.r2sshop.util.JwtUtil;
 import lombok.AllArgsConstructor;
+import org.springframework.security.authentication.AccountExpiredException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
@@ -67,14 +68,14 @@ public class UserService implements IUserService {
     }
 
     //Thực hiện đăng nhập và trả về token
-    public String login(String username, String password) throws Exception {
+    public String login(String username, String password) throws AuthenticationException {
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
             UserDetails userDetails = customUserDetailsService.loadUserByUsername(username);
             String role = userDetails.getAuthorities().isEmpty() ? "" : userDetails.getAuthorities().iterator().next().getAuthority();
             return jwtUtil.generateToken(userDetails, role);
         } catch (AuthenticationException e) {
-            throw new Exception("Invalid username or password");
+           throw new AccountExpiredException("Invalid username or password", e);
         }
     }
 }
