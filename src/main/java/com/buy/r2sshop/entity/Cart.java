@@ -20,4 +20,8 @@ public class Cart {
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
+
+    @OneToOne
+    @JoinColumn(name = "order_id")
+    private Orders order;
 }

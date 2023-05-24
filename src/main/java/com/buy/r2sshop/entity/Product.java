@@ -26,8 +26,8 @@ public class Product {
     @Column(name = "description")
     private String description;
 
-    @Column(name = "image_url")
-    private String imageUrl;
+    @Column(name = "productImageUrl")
+    private String productImageUrl;
 
     @JsonBackReference
     @ManyToOne
