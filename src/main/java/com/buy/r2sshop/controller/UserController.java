@@ -1,5 +1,6 @@
 package com.buy.r2sshop.controller;
 
+import com.buy.r2sshop.entity.User;
 import com.buy.r2sshop.payload.LoginRequest;
 import com.buy.r2sshop.payload.LoginResponse;
 import com.buy.r2sshop.payload.RegisterRequest;
@@ -10,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -73,6 +75,24 @@ public class UserController {
         } else {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Access denied");
         }
+    }
+
+    //Get, Update tất cả thông tin của User đang login.
+    @GetMapping("/user-info")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    public ResponseEntity<User> getUserInfo(Authentication authentication) {
+        String username = authentication.getName();
+        User user = userService.getUserByUsername(username);
+        return ResponseEntity.ok(user);
+    }
+
+    @PutMapping("/user-info")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<User> updateUser(Authentication authentication, @RequestBody User updatedUserData) {
+        String username = authentication.getName();
+        User user = userService.getUserByUsername(username);
+        User updatedUser = userService.updateUser(user.getId(), updatedUserData);
+        return ResponseEntity.ok(updatedUser);
     }
 
 

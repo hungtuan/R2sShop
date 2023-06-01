@@ -50,7 +50,7 @@ public class SecurityConfig {
         http
                 .csrf().disable()
                 .authorizeRequests()
-                .requestMatchers("/v1/**").permitAll()
+                .requestMatchers("/v1/login").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .sessionManagement()

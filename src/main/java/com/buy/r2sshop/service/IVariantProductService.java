@@ -7,4 +7,10 @@ import java.util.List;
 
 public interface IVariantProductService {
     List<VariantProduct> getVariantsByProduct(Product product);
+
+    VariantProduct addVariantProduct(Integer productId, VariantProduct variantProduct);
+
+    VariantProduct updateVariantProduct(Integer variantProductId, VariantProduct updatedVariantProduct);
+
+    void deleteVariantProduct(Integer variantProductId);
 }

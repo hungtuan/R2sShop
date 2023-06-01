@@ -26,11 +26,11 @@ public class Product {
     @Column(name = "description")
     private String description;
 
-    @Column(name = "productImageUrl")
-    private String productImageUrl;
+    @Column(name = "product_image_url")
+    private String product_image_url;
 
-    @JsonBackReference
     @ManyToOne
     @JoinColumn(name = "category_id")
     private Category category;
+
 }

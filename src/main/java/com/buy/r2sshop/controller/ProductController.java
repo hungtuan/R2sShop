@@ -55,4 +55,44 @@ public class ProductController {
         List<VariantProduct> variants = variantProductService.getVariantsByProduct(product);
         return new ResponseEntity<>(variants, HttpStatus.OK);
     }
+
+    //
+
+    @PostMapping("/product")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Product> addProduct(@RequestBody Product product, @RequestParam("categoryId") Integer categoryId) {
+        Product addedProduct = productService.addProduct(product, categoryId);
+        return new ResponseEntity<>(addedProduct, HttpStatus.CREATED);
+    }
+
+
+    @PutMapping("/{productId}")
+    public ResponseEntity<Product> updateProduct(@PathVariable Integer productId, @RequestBody Product updatedProduct) {
+        Product updated = productService.updateProduct(productId, updatedProduct);
+        return new ResponseEntity<>(updated, HttpStatus.OK);
+    }
+
+    @DeleteMapping("/{productId}")
+    public ResponseEntity<Void> deleteProduct(@PathVariable Integer productId) {
+        productService.deleteProduct(productId);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @PostMapping("/{productId}/variants")
+    public ResponseEntity<VariantProduct> addVariantProduct(@PathVariable Integer productId, @RequestBody VariantProduct variantProduct) {
+        VariantProduct addedVariantProduct = variantProductService.addVariantProduct(productId, variantProduct);
+        return new ResponseEntity<>(addedVariantProduct, HttpStatus.CREATED);
+    }
+
+    @PutMapping("/variants/{variantProductId}")
+    public ResponseEntity<VariantProduct> updateVariantProduct(@PathVariable Integer variantProductId, @RequestBody VariantProduct updatedVariantProduct) {
+        VariantProduct updated = variantProductService.updateVariantProduct(variantProductId, updatedVariantProduct);
+        return new ResponseEntity<>(updated, HttpStatus.OK);
+    }
+
+    @DeleteMapping("/variants/{variantProductId}")
+    public ResponseEntity<Void> deleteVariantProduct(@PathVariable Integer variantProductId) {
+        variantProductService.deleteVariantProduct(variantProductId);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
 }

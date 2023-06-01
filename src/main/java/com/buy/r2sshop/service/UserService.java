@@ -14,9 +14,12 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @AllArgsConstructor
 @Service
@@ -78,4 +81,25 @@ public class UserService implements IUserService {
            throw new AccountExpiredException("Invalid username or password", e);
         }
     }
+    //Lấy thông tin user
+    public User getUserByUsername(String username) {
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+    }
+
+    public User updateUser(Integer userId, User updatedUser) {
+        User existingUser = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // Các trường update
+        existingUser.setUsername(updatedUser.getUsername());
+
+        existingUser.setPassword(passwordEncoder.encode(updatedUser.getPassword()));
+
+
+
+
+        return userRepository.save(existingUser);
+    }
+
 }
